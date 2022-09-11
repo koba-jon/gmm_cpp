@@ -33,7 +33,7 @@ $ cd ..
 ### 3.2. Dataset Setting
 
 The following hierarchical relationships are recommended.
-
+![dataset](datasets/dataset.png)
 
 ### 3.3. Execution
 
