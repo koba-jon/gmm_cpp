@@ -15,7 +15,7 @@ $ sudo apt install libboost-dev libboost-all-dev
 ### Git Clone
 ~~~
 $ git clone https://github.com/koba-jon/gmm_cpp.git
-$ cd svm_cpp
+$ cd gmm_cpp
 ~~~
 
 ## 3. Usage
