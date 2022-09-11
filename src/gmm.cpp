@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include <random>
+#include <iomanip>
 #include <cmath>
 #include "gmm.hpp"
 #include "parameter.hpp"
@@ -473,7 +474,8 @@ void GMM::apply_EM(){
         for (long long n = 0; n < this->N; n++){
             this->L += std::log(this->ppdf_sum.at(n));
         }
-        this->log("likelihood = " + std::to_string(this->L) + "\n");
+        this->log("\r                                        ");
+        this->log("\rlikelihood: " + std::to_string(this->L) + " (+" + std::to_string(this->L - L_old) + ")");
 
 
     }while(this->L - L_old > this->eps);
@@ -506,9 +508,100 @@ void GMM::train(const std::vector<std::vector<double>> &data, const long long D_
     this->init_parameters(data);
 
     // (3) Training based on EM algorithm for GMM
+    this->log("\n/////////////////////// Training ///////////////////////\n");
     this->apply_EM();
+    this->log("\n////////////////////////////////////////////////////////\n");
+
+    // (4) Description for GMM parameters
+    this->log("********************************************************\n");
+    for (long long k = 0; k < this->K; k++){
+
+        this->log("<No." + std::to_string(k) + ">\n");
+
+        // (4.1) For 'pi'
+        this->log("mixing coefficient = " + std::to_string(this->pi.at(k)) + "\n");
+
+        // (4.2) For 'mu'
+        this->log("mean = [ ");
+        for (long long d = 0; d < this->D; d++){
+            this->log(std::to_string(this->mu.at(k, d, 0)) + " ");
+        }
+        this->log("]\n");
+
+        // (4.3) For 'sigma'
+        this->log("variance = [ ");
+        for (long long d = 0; d < this->D; d++){
+            this->log(std::to_string(this->sigma.at(k, d, d)) + " ");
+        }
+        this->log("]\n");
+
+        this->log("********************************************************\n");
+
+    }
+    this->log("////////////////////////////////////////////////////////\n\n");
 
     return;
 
 }
 
+
+// ------------------------------
+// class{GMM} -> function{test}
+// ------------------------------
+void GMM::test(const std::vector<std::string> &paths, const std::vector<std::vector<double>> &data){
+
+    size_t N_test;
+    std::string path;
+    std::vector<double> dat;
+    long long D_test;
+    Parameter x_test;
+    Parameter rate;
+    double sum;
+    long long idx;
+    double conf;
+
+    N_test = paths.size();
+    std::cout << "///////////////////////// Test /////////////////////////" << std::endl;
+    for (size_t n = 0; n < N_test; n++){
+
+        // Set data
+        path = paths[n];
+        dat = data[n];
+        D_test = (long long)dat.size();
+        x_test.create({D_test, 1});
+        for (long long d = 0; d < D_test; d++){
+            x_test.at(d, 0) = dat[d];
+        }
+        std::cout << "<" << path << ">";
+
+        // Calculate rate
+        sum = 0.0;
+        rate.create({this->K});
+        for (long long k = 0; k < this->K; k++){
+            rate.at(k) = this->pi.at(k) * math::calc_norm_pdf(x_test, this->mu(k), this->sigma(k));
+            sum += rate.at(k);
+        }
+        rate /= sum;
+        /********************************/
+        idx = 0;
+        conf = rate.at(0);
+        for (long long k = 1; k < this->K; k++){
+            if (rate.at(k) > conf){
+                idx = k;
+                conf = rate.at(k);
+            }
+        }
+        std::cout << "  class: No." << idx << "(" << std::fixed << std::setprecision(2) << conf << ")";
+        /********************************/
+        std::cout << "  rate: [ ";
+        for (long long k = 0; k < this->K; k++){
+            std::cout << std::fixed << std::setprecision(2) << rate.at(k) << " ";
+        }
+        std::cout << "]" << std::endl;
+
+    }
+    std::cout << "////////////////////////////////////////////////////////" << std::endl;
+
+    return;
+
+}

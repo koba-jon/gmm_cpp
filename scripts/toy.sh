@@ -4,5 +4,5 @@ DATA='toy'
 
 ./GMM \
     --dataset ${DATA} \
-    --D 2 \
-    --K 4
+    --D 3 \
+    --K 8

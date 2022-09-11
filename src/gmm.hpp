@@ -49,10 +49,11 @@ public:
     
     // Constructor
     GMM() = delete;
-    GMM(const bool verbose_ = true, const double eps_ = 0.000001);
+    GMM(const bool verbose_ = true, const double eps_ = 0.0000001);
 
     // Function
-    void train(const std::vector<std::vector<double>> &data, const long long D_, const long long K_ = 4);
+    void train(const std::vector<std::vector<double>> &data, const long long D_, const long long K_);
+    void test(const std::vector<std::string> &paths, const std::vector<std::vector<double>> &data);
 
 };
 

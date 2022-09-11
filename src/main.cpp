@@ -15,13 +15,13 @@ namespace fs = std::filesystem;
 namespace po = boost::program_options;
 
 // Function Prototype
-void Collect_Paths(const std::string root, const std::string sub, std::vector<std::string> &paths);
-std::vector<std::string> Get_Paths(const std::string root);
-std::vector<std::vector<double>> Get_Data(const std::vector<std::string> paths, const long long D);
+void Collect_Paths(const std::string &root, const std::string &sub, std::vector<std::string> &paths);
+std::vector<std::string> Get_Paths(const std::string &root);
+std::vector<std::vector<double>> Get_Data(const std::vector<std::string> &paths, const long long D);
 
 
 // ----------------------
-// 0. Argument Function
+// 0. Argument function
 // ----------------------
 po::options_description parse_arguments(){
 
@@ -29,17 +29,17 @@ po::options_description parse_arguments(){
 
     args.add_options()
 
-        // (1) Define for General Parameter
+        // (1) Define for general parameter
         ("help", "produce help message")
         ("dataset", po::value<std::string>()->default_value("toy"), "dataset name")
-        ("D", po::value<long long>()->default_value(2), "number of dimensions")
-        ("K", po::value<long long>()->default_value(4), "number of normal distribution")
+        ("D", po::value<long long>()->default_value(3), "number of dimensions")
+        ("K", po::value<long long>()->default_value(8), "number of normal distribution")
         ("verbose", po::value<bool>()->default_value(true), "verbose")
 
-        // (2) Define for Training
+        // (2) Define for training
         ("train_dir", po::value<std::string>()->default_value("train"), "training directory : ./datasets/<dataset>/<train_dir>/<all data>")
 
-        // (3) Define for Test
+        // (3) Define for test
         ("test_dir", po::value<std::string>()->default_value("test"), "test directory : ./datasets/<dataset>/<test_dir>/<all data>")
 
     ;
@@ -50,11 +50,11 @@ po::options_description parse_arguments(){
 
 
 // ------------------
-// 1. Main Function
+// 1. Main function
 // ------------------
 int main(int argc, const char *argv[]){
 
-    // (1) Extract Arguments
+    // (1) Extract arguments
     po::options_description args = parse_arguments();
     po::variables_map vm{};
     po::store(po::parse_command_line(argc, argv, args), vm);
@@ -64,7 +64,7 @@ int main(int argc, const char *argv[]){
         return 1;
     }
 
-    // (2.1) Get Training Data
+    // (2.1) Get training data
     std::string train_dir;
     std::vector<std::string> train_paths;
     std::vector<std::vector<double>> train_data;
@@ -77,7 +77,7 @@ int main(int argc, const char *argv[]){
     GMM gmm(vm["verbose"].as<bool>());
     gmm.train(train_data, vm["D"].as<long long>(), vm["K"].as<long long>());
 
-    // (3.1) Get Test Data
+    // (3.1) Get test data
     std::string test_dir;
     std::vector<std::string> test_paths;
     std::vector<std::vector<double>> test_data;
@@ -87,15 +87,17 @@ int main(int argc, const char *argv[]){
     test_data = Get_Data(test_paths, vm["D"].as<long long>());
 
     // (3.2) Test for GMM
+    gmm.test(test_paths, test_data);
 
     return 0;
+
 }
 
 
 // ------------------------------
-// 2. Collecting Paths Function
+// 2. Collecting paths function
 // ------------------------------
-void Collect_Paths(const std::string root, const std::string sub, std::vector<std::string> &paths){
+void Collect_Paths(const std::string &root, const std::string &sub, std::vector<std::string> &paths){
     
     fs::path ROOT(root);
     
@@ -117,9 +119,9 @@ void Collect_Paths(const std::string root, const std::string sub, std::vector<st
 
 
 // ---------------------------
-// 3. Getting Paths Function
+// 3. Getting paths function
 // ---------------------------
-std::vector<std::string> Get_Paths(const std::string root){
+std::vector<std::string> Get_Paths(const std::string &root){
 
     std::vector<std::string> paths;
 
@@ -132,9 +134,9 @@ std::vector<std::string> Get_Paths(const std::string root){
 
 
 // ---------------------------
-// 4. Getting Data Function
+// 4. Getting data function
 // ---------------------------
-std::vector<std::vector<double>> Get_Data(const std::vector<std::string> paths, const long long D){
+std::vector<std::vector<double>> Get_Data(const std::vector<std::string> &paths, const long long D){
 
     long long i;
     double element;
