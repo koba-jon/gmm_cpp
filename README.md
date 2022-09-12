@@ -1,5 +1,5 @@
 # GMM C++ Samples
-These are sample programs of Gaussian Mixture Model from scratch in C++.
+This is a sample program of Gaussian Mixture Model from scratch in C++.
 
 ## 1. Requirement
 
